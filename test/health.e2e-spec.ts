@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 
+import { DatabaseModule } from '@/database/database.module';
 import { HealthModule } from '@/health/health.module';
 
 describe('HealthController (e2e)', () => {
@@ -9,7 +10,7 @@ describe('HealthController (e2e)', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [HealthModule],
+      imports: [DatabaseModule, HealthModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -29,9 +30,9 @@ describe('HealthController (e2e)', () => {
           expect(res.body).toEqual(
             expect.objectContaining({
               status: 'ok',
-              details: {},
+              details: { database: { status: 'up' } },
               error: {},
-              info: {},
+              info: { database: { status: 'up' } },
             }),
           ),
         );

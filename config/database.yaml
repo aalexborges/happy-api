@@ -1,0 +1,32 @@
+# See the options available at: https://typeorm.io/data-source-options
+
+default: &default
+  type: postgres
+  logging: false
+  namingStrategy: <%- new SnakeNamingStrategy() %>
+  subscribers:
+    - 'dist/**/*.subscriber.js'
+  migrations:
+    - 'dist/database/migrations/*.js'
+  entities:
+    - 'dist/**/*.entity.js'
+
+development:
+  <<: *default
+  url: <%- Env.DATABASE_URL.replace('?', '_development?') %>
+  logging: true
+
+test:
+  <<: *default
+  url: <%- Env.DATABASE_URL.replace('?', '_test?') %>
+  migrations: null
+  dropSchema: true
+  synchronize: true
+  subscribers:
+    - 'src/**/*.subscriber.ts'
+  entities:
+    - 'src/**/*.entity.ts'
+
+production:
+  <<: *default
+  url: <%- Env.DATABASE_URL %>

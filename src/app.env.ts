@@ -1,9 +1,14 @@
 import 'dotenv/config';
 
 import { Expose, plainToInstance } from 'class-transformer';
-import { IsEnum, IsInt, IsPositive, IsString, validateSync } from 'class-validator';
+import { IsEnum, IsInt, IsPositive, IsString, Matches, validateSync } from 'class-validator';
 
 class EnvSchema {
+  @Expose()
+  @Matches(/^postgresql:\/\/.*$/)
+  @IsString()
+  DATABASE_URL: string;
+
   @Expose()
   @IsEnum(['development', 'test', 'production'])
   NODE_ENV: 'development' | 'test' | 'production' = 'development';
