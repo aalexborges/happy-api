@@ -1,0 +1,40 @@
+name: happy-api
+
+
+services:
+  postgres:
+    image: postgres:16.2-alpine
+    container_name: happy-postgres
+    environment:
+      POSTGRES_DB: happy_development
+      POSTGRES_USER: happy
+      POSTGRES_PASSWORD: happy
+    ports:
+      - "5432:5432"
+    volumes:
+      - happy-postgres:/var/lib/postgresql/data
+      - ./docker-init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U diss -d happy_development"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: happy-app
+    volumes:
+      - .:/app
+    environment:
+      - ENV_NAME=development
+      - DATABASE_URL=postgresql://happy:happy@postgres:5432/happy?encoding=utf8&pool=5&timeout=5000
+      - NODE_ENV=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  happy-postgres:
