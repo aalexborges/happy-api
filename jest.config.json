@@ -11,5 +11,6 @@
   "clearMocks": true,
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/../src/$1"
-  }
+  },
+  "coveragePathIgnorePatterns": ["src/database/migration", "src/database/database.data-source.ts"]
 }
