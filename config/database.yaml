@@ -3,7 +3,6 @@
 default: &default
   type: postgres
   logging: false
-  namingStrategy: <%- new SnakeNamingStrategy() %>
   subscribers:
     - 'dist/**/*.subscriber.js'
   migrations:

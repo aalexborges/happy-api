@@ -15,12 +15,12 @@ type DatabaseYAML = {
   production: DataSourceOptions;
 };
 
-const DATABASE_CONFIG = loadYAML<DatabaseYAML>(join(__dirname, '..', '..', 'config', 'database.yaml'), {
-  SnakeNamingStrategy,
-  Env,
-});
+const DATABASE_CONFIG = loadYAML<DatabaseYAML>(join(__dirname, '..', '..', 'config', 'database.yaml'), { Env });
 
-const DATABASE_BASE_CONFIG = { logger: new DatabaseLogger() } satisfies Partial<DataSourceOptions>;
+const DATABASE_BASE_CONFIG = {
+  logger: new DatabaseLogger(),
+  namingStrategy: new SnakeNamingStrategy(),
+} satisfies Partial<DataSourceOptions>;
 
 export const DATABASE_CONFIG_BY_ENV = Env.isDevelopment
   ? { ...DATABASE_BASE_CONFIG, ...DATABASE_CONFIG.development }
