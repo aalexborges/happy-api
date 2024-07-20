@@ -19,7 +19,7 @@ export class AuditLogSubscriber implements EntitySubscriberInterface {
 
   private async createAuditLog(action: AuditLogEvent, event: InsertEvent<any> | UpdateEvent<any> | RemoveEvent<any>) {
     const target = event['databaseEntity']?.constructor || event?.entity?.constructor;
-    if (!Reflect.getMetadata(AUDIT_ENTITY, target)) return;
+    if (!target || !Reflect.getMetadata(AUDIT_ENTITY, target)) return;
 
     const auditLog = AuditLog.create({
       event: action,

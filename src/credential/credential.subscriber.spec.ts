@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { InsertEvent, UpdateEvent } from 'typeorm';
 
 import { AppException } from '@/exception/exception.model';
@@ -8,6 +9,9 @@ import { CredentialSubscriber } from './credential.subscriber';
 describe('CredentialSubscriber', () => {
   const subscriber = new CredentialSubscriber();
 
+  const password = faker.internet.password({ length: 15, prefix: '1@Te' });
+  const diffPassword = faker.internet.password({ length: 15, prefix: '2@Di' });
+
   describe('.listenTo', () => {
     it('returns Credential', () => {
       expect(subscriber.listenTo()).toEqual(Credential);
@@ -17,7 +21,6 @@ describe('CredentialSubscriber', () => {
   describe('.beforeInsert', () => {
     describe('by password', () => {
       it('encrypts password', async () => {
-        const password = '@Test123';
         const event = <InsertEvent<any>>{ entity: { password } };
 
         await expect(subscriber.beforeInsert(event)).resolves.toBeUndefined();
@@ -30,7 +33,6 @@ describe('CredentialSubscriber', () => {
       describe('with password confirmation', () => {
         describe('when the password and password confirmation match', () => {
           it('encrypts password', async () => {
-            const password = '@Test123';
             const event = <InsertEvent<any>>{ entity: { password, passwordConfirmation: password } };
 
             await expect(subscriber.beforeInsert(event)).resolves.toBeUndefined();
@@ -47,7 +49,7 @@ describe('CredentialSubscriber', () => {
             expect.assertions(2);
 
             try {
-              const event = <InsertEvent<any>>{ entity: { password: '@Test123', passwordConfirmation: '@Diff4567' } };
+              const event = <InsertEvent<any>>{ entity: { password, passwordConfirmation: diffPassword } };
               await subscriber.beforeInsert(event);
             } catch (err) {
               expect(err).toBeInstanceOf(AppException);
@@ -60,7 +62,6 @@ describe('CredentialSubscriber', () => {
 
     describe('by passwordDigest', () => {
       it('encrypts password', async () => {
-        const password = '@Test123';
         const event = <InsertEvent<any>>{ entity: { passwordDigest: password } };
 
         await expect(subscriber.beforeInsert(event)).resolves.toBeUndefined();
@@ -81,7 +82,6 @@ describe('CredentialSubscriber', () => {
   describe('.beforeUpdate', () => {
     describe('by password', () => {
       it('encrypts password', async () => {
-        const password = '@Test123';
         const event = <UpdateEvent<any>>{ entity: <any>{ password }, updatedColumns: [] };
 
         await expect(subscriber.beforeUpdate(event)).resolves.toBeUndefined();
@@ -94,7 +94,6 @@ describe('CredentialSubscriber', () => {
       describe('with password confirmation', () => {
         describe('when the password and password confirmation match', () => {
           it('encrypts password', async () => {
-            const password = '@Test123';
             const event = <UpdateEvent<any>>{
               entity: <any>{ password, passwordConfirmation: password },
               updatedColumns: [],
@@ -115,7 +114,7 @@ describe('CredentialSubscriber', () => {
 
             try {
               const event = <UpdateEvent<any>>{
-                entity: <any>{ password: '@Test123', passwordConfirmation: '@Diff4567' },
+                entity: <any>{ password: password, passwordConfirmation: diffPassword },
                 updatedColumns: [],
               };
 
@@ -131,7 +130,6 @@ describe('CredentialSubscriber', () => {
 
     describe('by password digest', () => {
       it('encrypts password', async () => {
-        const password = '@Test123';
         const event = <UpdateEvent<any>>{
           entity: <any>{ passwordDigest: password },
           updatedColumns: [{ propertyName: 'passwordDigest' }],
@@ -154,7 +152,6 @@ describe('CredentialSubscriber', () => {
 
   describe('.afterInsert', () => {
     it('deletes password and password confirmation values', () => {
-      const password = '@Test123';
       const event = <InsertEvent<any>>{ entity: { password, passwordConfirmation: password } };
 
       expect(subscriber.afterInsert(event)).toBeUndefined();
@@ -164,7 +161,6 @@ describe('CredentialSubscriber', () => {
 
   describe('.afterUpdate', () => {
     it('deletes password and password confirmation values', () => {
-      const password = '@Test123';
       const event = <UpdateEvent<any>>{ entity: <any>{ password, passwordConfirmation: password } };
 
       expect(subscriber.afterUpdate(event)).toBeUndefined();
