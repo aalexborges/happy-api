@@ -12,5 +12,6 @@
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/../src/$1"
   },
+  "setupFilesAfterEnv": ["<rootDir>/../jest.setup.ts"],
   "coveragePathIgnorePatterns": ["src/database/migration", "src/database/database.data-source.ts"]
 }
